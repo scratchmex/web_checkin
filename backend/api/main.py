@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from .models import User, Event
 
 app = FastAPI()
 
@@ -14,10 +15,10 @@ async def get_events():
 
 
 @app.post("/events")
-async def create_event():
+async def create_event(event: Event):
     return {
         "message": f"Here you add events.",
-        "data": "Body here"
+        "data": event
     }
 
 
@@ -32,9 +33,9 @@ async def get_user(id: int):
 
 
 @app.post("/user")
-async def create_user():
+async def create_user(user: User):
     return {
         "message": f"Here you create users.",
-        "id": "return user id",
-        "data": "Body here."
+        "id": user.id,
+        "data": user
     }
