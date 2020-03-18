@@ -7,7 +7,8 @@ from . import config
 
 engine = create_engine(
     config.SQLALCHEMY_DATABASE_URI,
-    connect_args={"check_same_thread": False},  # only for SQLite
+    connect_args={"check_same_thread": False} if  # only for SQLite
+        config.SQLALCHEMY_DATABASE_URI.startswith('sqlite') else {},  # noqa
     echo=True
 )
 
