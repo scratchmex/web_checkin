@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: backend.dockerfile
+    restart: unless-stopped
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:${POSTGRES_PASSWORD}@db/postgres
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - 8080:80
