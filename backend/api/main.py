@@ -138,7 +138,7 @@ async def get_checkins(skip: int = 0, limit: int = 100,
     return checkins
 
 
-@app.post("/checkins/{id}",
+@app.post("/checkins",
           response_model=schemas.Event,
           status_code=201,
           tags=["checkins"])
