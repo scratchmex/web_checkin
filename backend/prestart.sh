@@ -1,0 +1,1 @@
+python -m api.init_db
