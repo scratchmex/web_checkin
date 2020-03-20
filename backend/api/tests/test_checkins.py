@@ -61,7 +61,7 @@ def test_get_checkin():
     assert response.status_code == 404
 
 
-# todo: monkeymock default time to be FAKE_TIME
+# TODO: monkeymock default time to be FAKE_TIME
 # remove object_hook=remove_date exclude={"date"} remove_date
 # from assertions
 def remove_date(dict_):

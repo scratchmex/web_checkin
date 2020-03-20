@@ -9,7 +9,18 @@ FAKE_TIME = datetime.datetime.fromisoformat("2020-03-19T03:30:00")
 init_db()
 
 
-# todo: fix path models.DEFAULT_DATE
+MASTER_KEY = "super secure masterkey"
+config.MASTER_KEY = MASTER_KEY
+
+SECRET_KEY = "super secure secretkey"
+config.SECRET_KEY = SECRET_KEY
+
+
+# TODO fix datetime imports from all files
+# from models.DEFAULT_DATE
+# from auth.create_token
+# then check tests/test_:
+# checkins, auth
 @pytest.fixture(autouse=True)
 def patch_datetime_utcnow(monkeypatch):
     class fake_datetime(datetime.datetime):
