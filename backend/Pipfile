@@ -7,7 +7,7 @@ verify_ssl = true
 requests = "*"
 pytest = "*"
 flake8 = "*"
-pylint = "*"
+pytest-cov = "*"
 
 [packages]
 fastapi = "*"

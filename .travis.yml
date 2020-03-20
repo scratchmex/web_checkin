@@ -9,7 +9,9 @@ jobs:
     - python: "nightly"
 
 env:
-  - SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
+  global:
+    - SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
+    - CODECOV_TOKEN="fc5bf719-41db-4351-8fbd-59308bdd9d19"
 
 before_install:
   - cd backend/
@@ -21,4 +23,7 @@ install:
 # command to run tests
 script:
   - flake8
-  - pytest
+  - pytest --cov=api --cov-report=xml
+
+after_success:
+  - curl -s https://codecov.io/bash | bash
