@@ -5,7 +5,7 @@ from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
 class Message(BaseModel):
-    message: str = None
+    message: str
 
 
 class BaseItem(BaseModel):
@@ -19,8 +19,7 @@ class User(BaseItem):
 
 
 class Event(BaseItem):
-    id: int = None
-    date: datetime.date = None
+    date: datetime.datetime
     title: str
 
 
@@ -29,9 +28,18 @@ class CheckIn(BaseItem):
     event_id: int
 
 
+class EventOut(Event):
+    id: int
+
+
 class UserDB(User):
-    events_attended: List[Event]
+    events_attended: List[EventOut]
 
 
 class EventDB(Event):
+    id: int
     attendants: List[User]
+
+
+class CheckInDB(CheckIn):
+    date: datetime.datetime

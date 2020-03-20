@@ -1,8 +1,11 @@
+import datetime
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
 from .database import Base
+
+DEFAULT_DATE = datetime.datetime.utcnow
 
 
 class CheckIn(Base):
@@ -12,7 +15,7 @@ class CheckIn(Base):
                      primary_key=True)
     event_id = Column('event_id', Integer, ForeignKey('events.id'),
                       primary_key=True)
-    date = Column('date', DateTime, default=datetime.utcnow)
+    date = Column('date', DateTime, default=DEFAULT_DATE)
 
 
 class User(Base):
@@ -31,7 +34,7 @@ class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(DateTime, default=datetime.utcnow)
+    date = Column(DateTime, default=DEFAULT_DATE)
     title = Column(String, unique=True)
     attendants = relationship(
         "User",
