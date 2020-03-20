@@ -1,19 +1,19 @@
 from fastapi.logger import logger
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
 from .database import engine, get_db
 from . import models
 
 
-# init db models
-models.Base.metadata.create_all(bind=engine)
+date = datetime(2020, 3, 19, 3, 30)
 
 # test data
 events = [
-    {"id": 1, "title": "seminario mimbela"},
-    {"id": 2, "title": "seminario herrera"},
-    {"id": 3, "title": "seminario lamoneda"},
-    {"id": 4, "title": "seminario arizmendi"}
+    {"id": 1, "date": date, "title": "seminario mimbela"},
+    {"id": 2, "date": date, "title": "seminario herrera"},
+    {"id": 3, "date": date, "title": "seminario lamoneda"},
+    {"id": 4, "date": date, "title": "seminario arizmendi"}
 ]
 
 users = [
@@ -24,22 +24,29 @@ users = [
 ]
 
 checkins = [
-    {"user_id": 1, "event_id": 1},
-    {"user_id": 1, "event_id": 3},
-    {"user_id": 2, "event_id": 2},
-    {"user_id": 2, "event_id": 4},
-    {"user_id": 3, "event_id": 4},
-    {"user_id": 4, "event_id": 4}
+    {"user_id": 1, "event_id": 1, "date": date},
+    {"user_id": 1, "event_id": 3, "date": date},
+    {"user_id": 2, "event_id": 2, "date": date},
+    {"user_id": 2, "event_id": 4, "date": date},
+    {"user_id": 3, "event_id": 4, "date": date},
+    {"user_id": 4, "event_id": 4, "date": date}
 ]
 
-events = [models.Event(**event) for event in events]
-users = [models.User(**user) for user in users]
-checkins = [models.CheckIn(**checkin) for checkin in checkins]
 
-try:
-    logger.info("Inserting testing data...")
-    db = next(get_db())
-    db.add_all(events+users+checkins)
-    db.commit()
-except IntegrityError:
-    logger.info("Testing data exists.")
+events_models = [models.Event(**event) for event in events]
+users_models = [models.User(**user) for user in users]
+checkins_models = [models.CheckIn(**checkin) for checkin in checkins]
+
+
+def init_db():
+    try:
+        # init db models
+        logger.info("Inserting db models...")
+        models.Base.metadata.create_all(bind=engine)
+
+        logger.info("Inserting testing data...")
+        db = next(get_db())
+        db.add_all(events_models+users_models+checkins_models)
+        db.commit()
+    except IntegrityError:
+        logger.info("Testing data exists.")
