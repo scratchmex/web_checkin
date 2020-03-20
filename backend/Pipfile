@@ -4,6 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+requests = "*"
+pytest = "*"
+flake8 = "*"
+pylint = "*"
 
 [packages]
 fastapi = "*"
@@ -11,6 +15,8 @@ async-exit-stack = "*"
 async-generator = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
+pydantic = "*"
+uvicorn = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
