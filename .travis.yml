@@ -1,16 +1,22 @@
 language: python
 python:
-  - "3.6"
   - "3.7"
   - "3.8"
+  - "nightly"
+
+jobs:
+  allow_failures:
+    - python: "nightly"
+
+env:
+  - SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
 
 before_install:
   - cd backend/
 
 # command to install dependencies
 install:
-  - pip install pipenv flake8 pytest
-  - pipenv install --system --deploy
+  - pipenv install --dev --deploy
 
 # command to run tests
 script:
