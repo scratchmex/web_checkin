@@ -77,6 +77,9 @@ def test_create_checkin():
     assert response.json(object_hook=remove_date) \
         == json.loads(checkin_db.json(exclude={"date"}))
 
+    response = client.post("/checkins", json=checkin.dict())
+    assert response.status_code == 400
+
     response = client.get("/checkins/3/1")
     assert response.status_code == 200
     assert response.json(object_hook=remove_date) \

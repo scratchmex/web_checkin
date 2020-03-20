@@ -9,7 +9,8 @@ jobs:
     - python: "nightly"
 
 env:
-  - SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
+  global:
+    - SQLALCHEMY_DATABASE_URI="sqlite:///:memory:"
 
 before_install:
   - cd backend/
@@ -21,4 +22,7 @@ install:
 # command to run tests
 script:
   - flake8
-  - pytest
+  - pytest --cov=api --cov-report=xml
+
+after_success:
+  - curl -s https://codecov.io/bash | bash
