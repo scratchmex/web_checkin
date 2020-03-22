@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Home - Future Lab</title>
+    <title>Web Checkin</title>
     <meta name="description" content="Web Checkin front-end app">
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="assets/fonts/ionicons.min.css">
     <link rel="stylesheet" href="assets/fonts/fontawesome5-overrides.min.css">
     <link rel="stylesheet" href="assets/css/styles.min.css">
+    <script type="text/javascript" src="assets/js/jsqrscanner.nocache.js"></script>
 </head>
 
 <body id="page-top">
@@ -48,7 +49,18 @@
                     <div class="input-group">
                         <div class="input-group-prepend"><span class="input-group-text">#</span></div><input class="border rounded form-control" type="text" id="nua-input" placeholder="NUA" required="" name="user-nua">
                         <div class="input-group-append"></div>
-                    </div><input type="file" id="file-test" class="form-control-file" required="" name="upfile"></div><button class="btn btn-primary btn-block" id="test-button" type="submit">Enviar</button></form>
+                    </div>
+                    <div >
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <button class="btn btn-outline-secondary" onclick="toggleScanner()" type="button"><i class="fas fa-qrcode"></i></button>
+                            </div>
+                            <input type="text" id="qrTextField" class="form-control" placeholder="Token QR">
+                        </div>
+                    <div id="scanner"></div>
+                </div>
+                <button class="btn btn-primary btn-block" id="test-button" type="submit">Enviar</button>
+            </form>
         </div>
     </section>
     <section id="info" class="bg-primary text-white mb-0">
@@ -106,6 +118,47 @@
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
     <script src="assets/js/script.min.js"></script>
+    <script type="text/javascript">
+        let jbScanner = null;
+        let scannerShown = false;
+        let first = true;
+        
+        function toggleScanner() {
+            let scannerParent = document.getElementById("scanner");
+            if(scannerShown) {
+                jbScanner.removeFrom(scannerParent);
+                scannerShown = false;
+            } else {
+                jbScanner.appendTo(scannerParent);
+                scannerShown = true;
+                if(first) {
+                    first = false;
+                    scannerParent.firstChild.className = "embed-responsive embed-responsive-16by9";
+                    scannerParent.firstChild.firstChild.className = "embed-responsive-item"
+                }
+            }
+        }
+
+        function onQRCodeScanned(scannedText)
+        {
+            var scannedTextMemo = document.getElementById("qrTextField");
+            if(scannedTextMemo)
+            {
+                scannedTextMemo.value = scannedText;
+            }
+            jbScanner.removeFrom(document.getElementById("scanner"))
+        }
+      
+        //this function will be called when JsQRScanner is ready to use
+        function JsQRScannerReady()
+        {
+            //create a new scanner passing to it a callback function that will be invoked when
+            //the scanner succesfully scans a QR code
+            jbScanner = new JsQRScanner(onQRCodeScanned);
+            //reduce the size of analyzed images to increase performance on mobile devices
+            jbScanner.setSnapImageMaxSize(300);
+        }
+      </script> 
 </body>
 
 </html>
