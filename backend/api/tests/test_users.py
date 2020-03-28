@@ -42,21 +42,21 @@ def test_get_users():
     assert response.status_code == 200
     assert response.json() == users_exp
 
-    response = client.get("/users", json={"skip": 2})
+    response = client.get("/users", params={"skip": 2})
     assert response.status_code == 200
     assert response.json() == users_exp[2:]
 
-    response = client.get("/users", json={"skip": -2})
+    response = client.get("/users", params={"skip": -2})
     assert response.status_code == 422
 
-    response = client.get("/users", json={"limit": 2})
+    response = client.get("/users", params={"limit": 2})
     assert response.status_code == 200
     assert response.json() == users_exp[:2]
 
-    response = client.get("/users", json={"limit": -2})
+    response = client.get("/users", params={"limit": -2})
     assert response.status_code == 422
 
-    response = client.get("/users", json={"skip": 1, "limit": 2})
+    response = client.get("/users", params={"skip": 1, "limit": 2})
     assert response.status_code == 200
     assert response.json() == users_exp[1:3]
 

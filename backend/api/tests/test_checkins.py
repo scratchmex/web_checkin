@@ -23,21 +23,21 @@ def test_get_checkins():
     assert response.status_code == 200
     assert response.json() == checkins_exp
 
-    response = client.get("/checkins", json={"skip": 2})
+    response = client.get("/checkins", params={"skip": 2})
     assert response.status_code == 200
     assert response.json() == checkins_exp[2:]
 
-    response = client.get("/checkins", json={"skip": -2})
+    response = client.get("/checkins", params={"skip": -2})
     assert response.status_code == 422
 
-    response = client.get("/checkins", json={"limit": 2})
+    response = client.get("/checkins", params={"limit": 2})
     assert response.status_code == 200
     assert response.json() == checkins_exp[:2]
 
-    response = client.get("/checkins", json={"limit": -2})
+    response = client.get("/checkins", params={"limit": -2})
     assert response.status_code == 422
 
-    response = client.get("/checkins", json={"skip": 1, "limit": 2})
+    response = client.get("/checkins", params={"skip": 1, "limit": 2})
     assert response.status_code == 200
     assert response.json() == checkins_exp[1:3]
 

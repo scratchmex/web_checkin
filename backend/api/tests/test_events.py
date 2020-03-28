@@ -41,21 +41,21 @@ def test_get_events():
     assert response.status_code == 200
     assert response.json() == events_exp
 
-    response = client.get("/events", json={"skip": 2})
+    response = client.get("/events", params={"skip": 2})
     assert response.status_code == 200
     assert response.json() == events_exp[2:]
 
-    response = client.get("/events", json={"skip": -2})
+    response = client.get("/events", params={"skip": -2})
     assert response.status_code == 422
 
-    response = client.get("/events", json={"limit": 2})
+    response = client.get("/events", params={"limit": 2})
     assert response.status_code == 200
     assert response.json() == events_exp[:2]
 
-    response = client.get("/events", json={"limit": -2})
+    response = client.get("/events", params={"limit": -2})
     assert response.status_code == 422
 
-    response = client.get("/events", json={"skip": 1, "limit": 2})
+    response = client.get("/events", params={"skip": 1, "limit": 2})
     assert response.status_code == 200
     assert response.json() == events_exp[1:3]
 
