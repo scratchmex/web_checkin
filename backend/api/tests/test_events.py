@@ -59,6 +59,19 @@ def test_get_event():
     assert response.status_code == 404
 
 
+def test_get_event_attendants():
+    response = client.get("/events/3/users")
+    assert response.status_code == 200
+    assert response.json() == events_attendants_exp[2]
+
+    response = client.get("/events/4/users")
+    assert response.status_code == 200
+    assert response.json() == events_attendants_exp[3]
+
+    response = client.get("/events/99/users")
+    assert response.status_code == 404
+
+
 def test_create_event():
     event = schemas.Event(title="seminario suave",
                           date="2020-03-20T03:30:00")

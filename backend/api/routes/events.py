@@ -29,6 +29,16 @@ async def get_event(id: int, db: Session = Depends(yield_db)):
     return event
 
 
+@router.get("/{id}/users", response_model=List[schemas.User])
+async def get_event_attendants(id: int, db: Session = Depends(yield_db)):
+    """Users who have attended to the event."""
+    event = crud.get_event(db, id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    return event.attendants
+
+
 @router.post("", response_model=schemas.EventOut, status_code=201)
 async def create_event(event: schemas.Event,
                        db: Session = Depends(yield_db)):
