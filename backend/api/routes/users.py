@@ -29,6 +29,16 @@ async def get_user(id: int, db: Session = Depends(yield_db)):
     return user
 
 
+@router.get("/{id}/events", response_model=List[schemas.EventOut])
+async def get_user_attended_events(id: int, db: Session = Depends(yield_db)):
+    """Events the user have attended."""
+    user = crud.get_user(db, id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    return user.attended_events
+
+
 @router.post("", response_model=schemas.User, status_code=201)
 async def create_user(user: schemas.User,
                       db: Session = Depends(yield_db)):

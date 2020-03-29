@@ -67,6 +67,19 @@ def test_get_user():
     assert response.status_code == 404
 
 
+def test_get_user_attended_events():
+    response = client.get("/users/1/events")
+    assert response.status_code == 200
+    assert response.json() == users_attended_events_exp[0]
+
+    response = client.get("/users/2/events")
+    assert response.status_code == 200
+    assert response.json() == users_attended_events_exp[1]
+
+    response = client.get("/users/99/events")
+    assert response.status_code == 404
+
+
 def test_create_user():
     user = schemas.User(id=13, name="ricardo")
 
