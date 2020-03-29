@@ -23,7 +23,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True)
-    events_attended = relationship(
+    attended_events = relationship(
         "Event",
         secondary="checkin",
         back_populates="attendants"
@@ -39,5 +39,5 @@ class Event(Base):
     attendants = relationship(
         "User",
         secondary="checkin",
-        back_populates="events_attended"
+        back_populates="attended_events"
     )

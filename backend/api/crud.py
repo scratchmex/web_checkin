@@ -50,10 +50,12 @@ def get_event_by_title(db: Session, event_title: str):
 def create_event(db: Session, event: schemas.Event):
     if get_event_by_title(db, event.title):
         raise ValueError("Event with that title already registered.")
-    db_event = models.Event(**event.dict(exclude={'id'}))
+    event = models.Event(**event.dict())
 
-    db.add(db_event)
+    db.add(event)
     db.commit()
+
+    db_event = get_event_by_title(db, event.title)
 
     return db_event
 

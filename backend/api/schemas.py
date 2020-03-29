@@ -41,7 +41,7 @@ class EventOut(Event):
 
 
 class UserDB(User):
-    events_attended: List[EventOut]
+    attended_events: List[EventOut]
 
 
 class EventDB(Event):

@@ -9,7 +9,7 @@ from ..database import yield_db
 router = APIRouter()
 
 
-@router.get("", response_model=List[schemas.EventDB])
+@router.get("", response_model=List[schemas.EventOut])
 async def get_events(skip: int = Query(0, ge=0),
                      limit: int = Query(100, ge=0),
                      db: Session = Depends(yield_db)):
@@ -19,7 +19,7 @@ async def get_events(skip: int = Query(0, ge=0),
     return events
 
 
-@router.get("/{id}", response_model=schemas.EventDB)
+@router.get("/{id}", response_model=schemas.EventOut)
 async def get_event(id: int, db: Session = Depends(yield_db)):
     """Event information."""
     event = crud.get_event(db, id)
@@ -29,7 +29,7 @@ async def get_event(id: int, db: Session = Depends(yield_db)):
     return event
 
 
-@router.post("", response_model=schemas.Event, status_code=201)
+@router.post("", response_model=schemas.EventOut, status_code=201)
 async def create_event(event: schemas.Event,
                        db: Session = Depends(yield_db)):
     """Here you add events."""
@@ -41,7 +41,7 @@ async def create_event(event: schemas.Event,
     return new_event
 
 
-@router.delete("/{id}", response_model=schemas.EventDB)
+@router.delete("/{id}", response_model=schemas.EventOut)
 async def delete_event(id: int, db: Session = Depends(yield_db)):
     """Here you delete events."""
     try:

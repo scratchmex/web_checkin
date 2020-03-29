@@ -6,34 +6,27 @@ client = TestClient(app)
 
 # expected data
 users_exp = [
-    {"id": 1,
-     "name": "ivan",
-     "events_attended": [
-         {"id": 1,
-          "date": "2020-03-19T03:30:00", "title": "seminario mimbela"},
-         {"id": 3,
-          "date": "2020-03-19T03:30:00", "title": "seminario lamoneda"}
-     ]},
-    {"id": 2,
-     "name": "tere",
-     "events_attended": [
-         {"id": 2,
-          "date": "2020-03-19T03:30:00", "title": "seminario herrera"},
-         {"id": 4,
-          "date": "2020-03-19T03:30:00", "title": "seminario arizmendi"}
-     ]},
-    {"id": 3,
-     "name": "leslie",
-     "events_attended": [
-         {"id": 4,
-          "date": "2020-03-19T03:30:00", "title": "seminario arizmendi"}
-     ]},
-    {"id": 4,
-     "name": "irwin",
-     "events_attended": [
-        {"id": 4,
-         "date": "2020-03-19T03:30:00", "title": "seminario arizmendi"}
-     ]}
+    {"id": 1, "name": "ivan"},
+    {"id": 2, "name": "tere"},
+    {"id": 3, "name": "leslie"},
+    {"id": 4, "name": "irwin"}
+]
+
+users_attended_events_exp = [
+    [
+        {"id": 1, "date": "2020-03-19T03:30:00", "title": "seminario mimbela"},
+        {"id": 3, "date": "2020-03-19T03:30:00", "title": "seminario lamoneda"}
+    ],
+    [
+        {"id": 2, "date": "2020-03-19T03:30:00", "title": "seminario herrera"},
+        {"id": 4, "date": "2020-03-19T03:30:00", "title": "seminario arizmendi"}  # noqa
+    ],
+    [
+        {"id": 4, "date": "2020-03-19T03:30:00", "title": "seminario arizmendi"}  # noqa
+    ],
+    [
+        {"id": 4, "date": "2020-03-19T03:30:00", "title": "seminario arizmendi"}  # noqa
+    ]
 ]
 
 
@@ -81,10 +74,9 @@ def test_create_user():
     assert response.status_code == 201
     assert response.json() == user
 
-    user_db = schemas.UserDB(events_attended=[], **user.dict())
     response = client.get("/users/13")
     assert response.status_code == 200
-    assert response.json() == user_db
+    assert response.json() == user
 
     user = schemas.User(id=4, name="irwin")
     response = client.post("/users", json=user.dict())
@@ -93,11 +85,10 @@ def test_create_user():
 
 def test_delete_user():
     user = schemas.User(id=13, name="ricardo")
-    user_db = schemas.UserDB(events_attended=[], **user.dict())
 
     response = client.delete(f"/users/{user.id}")
     assert response.status_code == 200
-    assert response.json() == user_db
+    assert response.json() == user
 
     response = client.get("/users/13")
     assert response.status_code == 404

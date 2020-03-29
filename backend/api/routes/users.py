@@ -9,7 +9,7 @@ from ..database import yield_db
 router = APIRouter()
 
 
-@router.get("", response_model=List[schemas.UserDB])
+@router.get("", response_model=List[schemas.User])
 async def get_users(skip: int = Query(0, ge=0),
                     limit: int = Query(100, ge=0),
                     db: Session = Depends(yield_db)):
@@ -19,7 +19,7 @@ async def get_users(skip: int = Query(0, ge=0),
     return users
 
 
-@router.get("/{id}", response_model=schemas.UserDB)
+@router.get("/{id}", response_model=schemas.User)
 async def get_user(id: int, db: Session = Depends(yield_db)):
     """User information."""
     user = crud.get_user(db, id)
@@ -41,7 +41,7 @@ async def create_user(user: schemas.User,
     return new_user
 
 
-@router.delete("/{id}", response_model=schemas.UserDB)
+@router.delete("/{id}", response_model=schemas.User)
 async def delete_user(id: int, db: Session = Depends(yield_db)):
     """Here you delete users."""
     try:
