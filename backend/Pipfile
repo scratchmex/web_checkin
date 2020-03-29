@@ -17,6 +17,9 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 pydantic = "*"
 uvicorn = "*"
+pyjwt = "*"
+passlib = {extras = ["bcrypt"],version = "*"}
+python-multipart = "*"
 
 [requires]
 python_version = "3.7"

@@ -2,6 +2,7 @@ import pytest
 import datetime
 
 from ..init_db import init_db
+from .. import config
 
 FAKE_TIME = datetime.datetime.fromisoformat("2020-03-19T03:30:00")
 
@@ -26,6 +27,10 @@ def patch_datetime_utcnow(monkeypatch):
     class fake_datetime(datetime.datetime):
         @staticmethod
         def utcnow():
+            return FAKE_TIME
+
+        @staticmethod
+        def now():
             return FAKE_TIME
 
     monkeypatch.setattr('datetime.datetime', fake_datetime)

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 import datetime
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
@@ -26,6 +26,14 @@ class Event(BaseItem):
 class CheckIn(BaseItem):
     user_id: int
     event_id: int
+
+
+class Token(BaseItem):
+    sub: str
+    iss: str
+    exp: int
+    iat: int
+    data: Any = None
 
 
 class EventOut(Event):
