@@ -3,8 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import schemas, crud, auth
-from ..database import get_db
+from .. import schemas, crud
+from ..database import yield_db
 
 router = APIRouter()
 
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.get("", response_model=List[schemas.UserDB])
 async def get_users(skip: int = Query(0, ge=0),
                     limit: int = Query(100, ge=0),
-                    db: Session = Depends(get_db)):
+                    db: Session = Depends(yield_db)):
     """All users should return here."""
     users = crud.get_users(db, skip=skip, limit=limit)
 
@@ -20,7 +20,7 @@ async def get_users(skip: int = Query(0, ge=0),
 
 
 @router.get("/{id}", response_model=schemas.UserDB)
-async def get_user(id: int, db: Session = Depends(get_db)):
+async def get_user(id: int, db: Session = Depends(yield_db)):
     """User information."""
     user = crud.get_user(db, id)
     if not user:
@@ -30,9 +30,8 @@ async def get_user(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=schemas.User, status_code=201)
-async def create_user(user: schemas.User, db: Session = Depends(get_db),
-                      token_out: schemas.TokenOut
-                      = Depends(auth.validate_token)):
+async def create_user(user: schemas.User,
+                      db: Session = Depends(yield_db)):
     """Here you create users."""
     try:
         new_user = crud.create_user(db, user)
@@ -43,9 +42,7 @@ async def create_user(user: schemas.User, db: Session = Depends(get_db),
 
 
 @router.delete("/{id}", response_model=schemas.UserDB)
-async def delete_user(id: int, db: Session = Depends(get_db),
-                      token_out: schemas.TokenOut
-                      = Depends(auth.validate_token)):
+async def delete_user(id: int, db: Session = Depends(yield_db)):
     """Here you delete users."""
     try:
         old_user = crud.delete_user(db, id)

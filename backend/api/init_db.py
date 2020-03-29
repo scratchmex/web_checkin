@@ -2,7 +2,7 @@ from fastapi.logger import logger
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
-from .database import engine, get_db
+from .database import engine, db_session_scope
 from . import models
 
 
@@ -45,8 +45,7 @@ def init_db():
         models.Base.metadata.create_all(bind=engine)
 
         logger.info("Inserting testing data...")
-        db = next(get_db())
-        db.add_all(events_models+users_models+checkins_models)
-        db.commit()
+        with db_session_scope() as db:
+            db.add_all(events_models+users_models+checkins_models)
     except IntegrityError:
         logger.info("Testing data exists.")

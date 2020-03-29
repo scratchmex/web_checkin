@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from .routes import root, users, events, checkins, auth
+from .routes import root, users, events, checkins
 
 
 app = FastAPI()

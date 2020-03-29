@@ -1,6 +1,8 @@
+from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.exc import SQLAlchemyError
 
 from . import config
 
@@ -18,9 +20,20 @@ Base = declarative_base()
 
 
 # Dependency
-def get_db() -> Session:
+@contextmanager
+def db_session_scope() -> Session:
+    """Provide a transactional scope around a series of operations."""
+    session = SessionLocal()
     try:
-        db = SessionLocal()
-        yield db
+        yield session
+        session.commit()
+    except SQLAlchemyError:
+        session.rollback()
+        raise
     finally:
-        db.close()
+        session.close()
+
+
+def yield_db() -> Session:
+    with db_session_scope() as db:
+        yield db
