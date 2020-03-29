@@ -4,6 +4,7 @@ import datetime
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
 
+# Base schemas
 class Message(BaseModel):
     message: str
 
@@ -36,10 +37,26 @@ class Token(BaseItem):
     data: Any = None
 
 
+class Admin(BaseItem):
+    name: str
+    username: str
+
+
+# In schemas
+class AdminIn(Admin):
+    password: str
+
+
+# Out schemas
 class EventOut(Event):
     id: int
 
 
+class AdminOut(Admin):
+    id: int
+
+
+# DB schemas
 class UserDB(User):
     attended_events: List[EventOut]
 
@@ -51,3 +68,7 @@ class EventDB(Event):
 
 class CheckInDB(CheckIn):
     date: datetime.datetime
+
+
+class AdminDB(AdminOut):
+    hashed_password: str

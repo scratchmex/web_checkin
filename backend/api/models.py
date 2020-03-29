@@ -41,3 +41,12 @@ class Event(Base):
         secondary="checkin",
         back_populates="attended_events"
     )
+
+
+class Admin(Base):
+    __tablename__ = "admins"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    username = Column(String, unique=True)
+    hashed_password = Column(String)

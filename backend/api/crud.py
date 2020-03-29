@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from . import models, schemas, auth
 
 
+# users
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
@@ -33,6 +34,7 @@ def delete_user(db: Session, user_id: int):
     return user
 
 
+# events
 def get_events(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Event).offset(skip).limit(limit).all()
 
@@ -71,6 +73,7 @@ def delete_event(db: Session, event_id: int):
     return event
 
 
+# checkins
 def get_checkins(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.CheckIn).offset(skip).limit(limit).all()
 
@@ -109,3 +112,54 @@ def delete_checkin(db: Session, checkin: schemas.CheckIn):
     db.commit()
 
     return checkin
+
+
+# admins
+def get_admins(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Admin).offset(skip).limit(limit).all()
+
+
+def get_admin(db: Session, admin_id: int):
+    return db.query(models.Admin).get(admin_id)
+
+
+def get_admin_by_username(db: Session, admin_username: str):
+    return db.query(models.Admin).filter(
+        models.Admin.username == admin_username
+    ).first()
+
+
+def create_admin(db: Session, admin: schemas.AdminIn):
+    if get_admin_by_username(db, admin.username):
+        raise ValueError("Admin with that username already registered.")
+    hashed_password = auth.hash_password(admin.password)
+
+    admin = models.Admin(hashed_password=hashed_password,
+                         **admin.dict(exclude={"password"}))
+
+    db.add(admin)
+    db.commit()
+
+    db_admin = get_admin_by_username(db, admin.username)
+
+    return db_admin
+
+
+def delete_admin(db: Session, admin_id: int):
+    admin = get_admin(db, admin_id)
+    if not admin:
+        raise ValueError("Admin not found.")
+
+    db.delete(admin)
+    db.commit()
+
+    return admin
+
+
+def authenticate_admin(db: Session, username: str, password: str):
+    admin = get_admin_by_username(db, username)
+
+    if not admin or not auth.verify_password(password, admin.hashed_password):
+        return False
+
+    return admin
