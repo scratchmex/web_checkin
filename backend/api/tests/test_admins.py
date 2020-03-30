@@ -1,6 +1,6 @@
 from starlette.testclient import TestClient
 
-from .. import app, schemas
+from .. import app, schemas, auth
 
 client = TestClient(app)
 
@@ -57,12 +57,12 @@ def test_create_admin():
     )
     admin_out = schemas.AdminOut(id=4, **admin.dict())
 
-    # app.dependency_overrides.pop(auth.verify_authentication, None)
+    app.dependency_overrides.pop(auth.verify_token, None)
 
-    # response = client.post("/admins", json=admin.dict())
-    # assert response.status_code == 401
+    response = client.post("/admins", json=admin.dict())
+    assert response.status_code == 401
 
-    # app.dependency_overrides[auth.verify_authentication] = lambda: True
+    app.dependency_overrides[auth.verify_token] = lambda: True
 
     response = client.post("/admins", json=admin.dict())
     assert response.status_code == 201
@@ -75,6 +75,8 @@ def test_create_admin():
     response = client.post("/admins", json=admin.dict())
     assert response.status_code == 400
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
 
 def test_delete_admin():
     admin = schemas.AdminIn(
@@ -84,12 +86,12 @@ def test_delete_admin():
     )
     admin_out = schemas.AdminOut(id=4, **admin.dict())
 
-    # app.dependency_overrides.pop(auth.verify_authentication, None)
+    app.dependency_overrides.pop(auth.verify_token, None)
 
-    # response = client.delete(f"/admins/{admin_out.id}")
-    # assert response.status_code == 401
+    response = client.delete(f"/admins/{admin_out.id}")
+    assert response.status_code == 401
 
-    # app.dependency_overrides[auth.verify_authentication] = lambda: True
+    app.dependency_overrides[auth.verify_token] = lambda: True
 
     response = client.delete(f"/admins/{admin_out.id}")
     assert response.status_code == 200
@@ -100,3 +102,5 @@ def test_delete_admin():
 
     response = client.delete(f"/admins/{admin_out.id}")
     assert response.status_code == 400
+
+    app.dependency_overrides.pop(auth.verify_token, None)

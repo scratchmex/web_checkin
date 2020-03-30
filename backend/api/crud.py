@@ -160,6 +160,6 @@ def authenticate_admin(db: Session, username: str, password: str):
     admin = get_admin_by_username(db, username)
 
     if not admin or not auth.verify_password(password, admin.hashed_password):
-        return False
+        raise ValueError("Invalid authentication credentials.")
 
     return admin

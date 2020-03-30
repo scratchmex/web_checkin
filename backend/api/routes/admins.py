@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 
-from .. import crud, schemas
+from .. import crud, schemas, auth
 from ..database import yield_db
 
 router = APIRouter()
@@ -28,7 +28,8 @@ async def get_admin(id: int, db: Session = Depends(yield_db)):
     return admin
 
 
-@router.post("", response_model=schemas.AdminOut, status_code=201)
+@router.post("", response_model=schemas.AdminOut, status_code=201,
+             dependencies=[Depends(auth.verify_token)])
 async def create_admin(admin: schemas.AdminIn,
                        db: Session = Depends(yield_db)):
     """Here you create admins."""
@@ -40,7 +41,8 @@ async def create_admin(admin: schemas.AdminIn,
     return new_admin
 
 
-@router.delete("/{id}", response_model=schemas.AdminOut)
+@router.delete("/{id}", response_model=schemas.AdminOut,
+               dependencies=[Depends(auth.verify_token)])
 async def delete_admin(id: int,
                        db: Session = Depends(yield_db)):
     """Here you delete admins."""
