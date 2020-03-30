@@ -1,6 +1,6 @@
 from starlette.testclient import TestClient
 
-from .. import app, schemas
+from .. import app, schemas, auth
 
 client = TestClient(app)
 
@@ -83,6 +83,13 @@ def test_get_user_attended_events():
 def test_create_user():
     user = schemas.User(id=13, name="ricardo")
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
+    response = client.post("/users", json=user.dict())
+    assert response.status_code == 401
+
+    app.dependency_overrides[auth.verify_token] = lambda: True
+
     response = client.post("/users", json=user.dict())
     assert response.status_code == 201
     assert response.json() == user
@@ -95,9 +102,18 @@ def test_create_user():
     response = client.post("/users", json=user.dict())
     assert response.status_code == 400
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
 
 def test_delete_user():
     user = schemas.User(id=13, name="ricardo")
+
+    app.dependency_overrides.pop(auth.verify_token, None)
+
+    response = client.delete(f"/users/{user.id}")
+    assert response.status_code == 401
+
+    app.dependency_overrides[auth.verify_token] = lambda: True
 
     response = client.delete(f"/users/{user.id}")
     assert response.status_code == 200
@@ -108,3 +124,5 @@ def test_delete_user():
 
     response = client.delete(f"/users/{user.id}")
     assert response.status_code == 400
+
+    app.dependency_overrides.pop(auth.verify_token, None)
