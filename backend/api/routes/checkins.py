@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import schemas, crud
+from .. import schemas, crud, auth
 from ..database import yield_db
 
 router = APIRouter()
@@ -31,7 +31,8 @@ async def get_checkin(user_id: int, event_id: int,
     return checkin
 
 
-@router.post("", response_model=schemas.CheckInDB, status_code=201)
+@router.post("", response_model=schemas.CheckInDB, status_code=201,
+             dependencies=[Depends(auth.verify_token)])
 async def create_checkin(checkin: schemas.CheckIn,
                          db: Session = Depends(yield_db)):
     """Here you add a check-in."""
@@ -43,7 +44,8 @@ async def create_checkin(checkin: schemas.CheckIn,
     return checkin
 
 
-@router.delete("", response_model=schemas.CheckInDB)
+@router.delete("", response_model=schemas.CheckInDB,
+               dependencies=[Depends(auth.verify_token)])
 async def delete_checkin(checkin: schemas.CheckIn,
                          db: Session = Depends(yield_db)):
     """Here you delete a check-in."""

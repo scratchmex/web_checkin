@@ -3,7 +3,7 @@ import json
 from starlette.testclient import TestClient
 
 from .conftest import FAKE_TIME
-from .. import app, schemas
+from .. import app, schemas, auth
 
 client = TestClient(app)
 
@@ -72,6 +72,13 @@ def test_create_checkin():
     checkin = schemas.CheckIn(user_id=3, event_id=1)
     checkin_db = schemas.CheckInDB(date=FAKE_TIME, **checkin.dict())
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
+    response = client.post("/checkins", json=checkin.dict())
+    assert response.status_code == 401
+
+    app.dependency_overrides[auth.verify_token] = lambda: True
+
     response = client.post("/checkins", json=checkin.dict())
     assert response.status_code == 201
     assert response.json(object_hook=remove_date) \
@@ -97,10 +104,19 @@ def test_create_checkin():
     response = client.post("/checkins", json=checkin.dict())
     assert response.status_code == 400
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
 
 def test_delete_checkin():
     checkin = schemas.CheckIn(user_id=3, event_id=1)
     checkin_db = schemas.CheckInDB(date=FAKE_TIME, **checkin.dict())
+
+    app.dependency_overrides.pop(auth.verify_token, None)
+
+    response = client.delete("/checkins", json=checkin.dict())
+    assert response.status_code == 401
+
+    app.dependency_overrides[auth.verify_token] = lambda: True
 
     response = client.delete("/checkins", json=checkin.dict())
     assert response.status_code == 200
@@ -121,3 +137,5 @@ def test_delete_checkin():
     checkin = schemas.CheckIn(user_id=13, event_id=31)
     response = client.delete("/checkins", json=checkin.dict())
     assert response.status_code == 400
+
+    app.dependency_overrides.pop(auth.verify_token, None)
