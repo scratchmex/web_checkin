@@ -2,7 +2,7 @@ import json
 
 from starlette.testclient import TestClient
 
-from .. import app, schemas
+from .. import app, schemas, auth
 
 client = TestClient(app)
 
@@ -77,6 +77,13 @@ def test_create_event():
                           date="2020-03-20T03:30:00")
     event_out = schemas.EventOut(id=5, **event.dict())
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
+    response = client.post("/events", data=event.json())
+    assert response.status_code == 401
+
+    app.dependency_overrides[auth.verify_token] = lambda: True
+
     response = client.post("/events", data=event.json())
     assert response.status_code == 201
     assert response.json() == json.loads(event_out.json())
@@ -90,11 +97,20 @@ def test_create_event():
     response = client.post("/events", data=event.json())
     assert response.status_code == 400
 
+    app.dependency_overrides.pop(auth.verify_token, None)
+
 
 def test_delete_event():
     event = schemas.Event(title="seminario suave",
                           date="2020-03-20T03:30:00")
     event_out = schemas.EventOut(id=5, **event.dict())
+
+    app.dependency_overrides.pop(auth.verify_token, None)
+
+    response = client.delete(f"/events/{event_out.id}")
+    assert response.status_code == 401
+
+    app.dependency_overrides[auth.verify_token] = lambda: True
 
     response = client.delete(f"/events/{event_out.id}")
     assert response.status_code == 200
@@ -105,3 +121,5 @@ def test_delete_event():
 
     response = client.delete(f"/events/{event_out.id}")
     assert response.status_code == 400
+
+    app.dependency_overrides.pop(auth.verify_token, None)

@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import schemas, crud
+from .. import schemas, crud, auth
 from ..database import yield_db
 
 router = APIRouter()
@@ -39,7 +39,8 @@ async def get_event_attendants(id: int, db: Session = Depends(yield_db)):
     return event.attendants
 
 
-@router.post("", response_model=schemas.EventOut, status_code=201)
+@router.post("", response_model=schemas.EventOut, status_code=201,
+             dependencies=[Depends(auth.verify_token)])
 async def create_event(event: schemas.Event,
                        db: Session = Depends(yield_db)):
     """Here you add events."""
@@ -51,7 +52,8 @@ async def create_event(event: schemas.Event,
     return new_event
 
 
-@router.delete("/{id}", response_model=schemas.EventOut)
+@router.delete("/{id}", response_model=schemas.EventOut,
+               dependencies=[Depends(auth.verify_token)])
 async def delete_event(id: int, db: Session = Depends(yield_db)):
     """Here you delete events."""
     try:
