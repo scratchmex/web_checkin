@@ -24,13 +24,6 @@ def is_masterkey(key: str):
     return key == config.MASTER_KEY
 
 
-def verify_masterkey(key: str):
-    if is_masterkey(key):
-        return True
-
-    return HTTPException(status_code=401, detail="¿?")
-
-
 # Token with JWT
 def create_token(to_encode: dict, expires_delta: timedelta = None):
     if not expires_delta:
@@ -47,25 +40,83 @@ def create_token(to_encode: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(token.dict(), config.SECRET_KEY,
                              algorithm=config.JWT_ALGORITHM)
 
-    return encoded_jwt
+    return encoded_jwt.decode("utf")
 
 
 def decode_token(token: str):
     try:
         payload = jwt.decode(token, config.SECRET_KEY,
-                             algorithms=[config.JWT_ALGORITHM])
+                             algorithms=config.JWT_ALGORITHM)
     except PyJWTError:
         raise
 
     return payload
 
 
+# create special token type
+def create_admin_token(*, admin_id: int):
+    payload = {
+        "iss": f"admin:{admin_id}",
+        "sub": "admin:auth",
+    }
+    token = create_token(payload)
+
+    return token
+
+
+def create_event_token(*, admin_id: int, event_id: int):
+    payload = {
+        "iss": f"admin:{admin_id}",
+        "sub": f"event:{event_id}",
+    }
+    token = create_token(payload)
+
+    return token
+
+
+def create_checkin_token(*, user: schemas.User, event_id: int):
+    payload = {
+        "iss": f"user:{user.id}",
+        "sub": f"checkin:{event_id}",
+        "data": user.dict(include={"name"})
+    }
+    token = create_token(payload)
+
+    return token
+
+
+def format_token(token: str):
+    try:
+        payload = decode_token(token)
+    except PyJWTError:
+        raise
+
+    exp = payload["exp"]
+    iat = payload["iat"]
+    token_out = schemas.TokenOut(
+        access_token=token,
+        expires_in=exp-iat
+    )
+
+    return token_out
+
+
 # oauth scheme
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token/auth")
 
 
-# oauth operations
-def verify_token(token: str = Depends(oauth2_scheme)):
+# authentication depends
+def verify_token(token: str = Depends(oauth2_scheme)) -> schemas.Token:
+    if is_masterkey(token):
+        payload = {
+            "iss": "admin:0",
+            "sub": "admin:auth",
+            "iat": int(datetime.now().timestamp()),
+            "exp": int(datetime.now().timestamp())
+        }
+
+        return payload
+
     try:
         payload = decode_token(token)
     except PyJWTError as e:
@@ -76,12 +127,3 @@ def verify_token(token: str = Depends(oauth2_scheme)):
         )
 
     return payload
-
-
-# authentication depends
-def verify_authentication(token: str = Depends(oauth2_scheme)) -> bool:
-    if verify_masterkey(token):
-        return True
-
-    if verify_token(token):
-        return True

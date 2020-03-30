@@ -19,6 +19,7 @@ def test_bcrypt_hashing():
 
 def test_masterkey():
     assert auth.is_masterkey(MASTER_KEY)
+    assert auth.verify_token(MASTER_KEY)
 
 
 # TODO uncomment iat assertion and import FAKE_TIME
@@ -31,9 +32,12 @@ def test_JWT():
     token = auth.create_token(payload)
     token_decoded = auth.decode_token(token)
 
+    # expired at FAKE_DATE token but valid
+    valid_but_expired_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODQ2MTAyMDAsImlhdCI6MTU4NDYxMDIwMH0.sz90TIqG6oQOXU4ov52sx4Oxs6JhH6CHk727DdngRN0"  # noqa
     with pytest.raises(PyJWTError):
-        # expired at FAKE_DATE token but valid
-        auth.decode_token("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODQ2MTAyMDAsImlhdCI6MTU4NDYxMDIwMH0.sz90TIqG6oQOXU4ov52sx4Oxs6JhH6CHk727DdngRN0")  # noqa
+        auth.decode_token(valid_but_expired_token)
+    with pytest.raises(PyJWTError):
+        auth.format_token(valid_but_expired_token)
 
     # assert token_decoded.get("iat") == int(FAKE_TIME.timestamp())
 

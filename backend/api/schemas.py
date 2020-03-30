@@ -30,10 +30,10 @@ class CheckIn(BaseItem):
 
 
 class Token(BaseItem):
-    sub: str
     iss: str
-    exp: int
+    sub: str
     iat: int
+    exp: int
     data: Any = None
 
 
@@ -54,6 +54,12 @@ class EventOut(Event):
 
 class AdminOut(Admin):
     id: int
+
+
+class TokenOut(BaseModel):
+    access_token: str
+    token_type: str = "Bearer"
+    expires_in: int
 
 
 # DB schemas

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from .routes import root, users, events, checkins, admins
+from .routes import root, users, events, checkins, admins, token
 
 
 app = FastAPI()
@@ -14,6 +14,12 @@ app.include_router(
     admins.router,
     prefix="/admins",
     tags=["admins"]
+)
+
+app.include_router(
+    token.router,
+    prefix="/token",
+    tags=["token"]
 )
 
 app.include_router(
