@@ -43,7 +43,7 @@ function postAdmin() {
         method: 'post',
         headers: {
             'Authorization': 'Bearer ' + getCookie('access_token'),
-            'Content-Type': 'text/plain'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
     };

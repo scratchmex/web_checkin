@@ -41,5 +41,8 @@ export default function AdminNavbar() {
 }
 
 function logout() {
+    let d = new Date();
+    // d.setTime(d.getTime);
+    document.cookie = `access_token=; expires=${d.toUTCString()};`;
     window.location.href = "/";
 }

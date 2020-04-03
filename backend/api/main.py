@@ -1,10 +1,21 @@
 from fastapi import FastAPI
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 
 from .routes import root, users, events, checkins, admins, token
 
+from .init_db import init_db
 
-app = FastAPI()
+middleware = [
+    Middleware(CORSMiddleware, 
+                allow_origins=['*'], 
+                allow_methods=['GET', 'POST', 'DELETE'],
+                allow_headers=['*'])
+]
 
+app = FastAPI(middleware=middleware)
+
+init_db()
 
 app.include_router(
     root.router

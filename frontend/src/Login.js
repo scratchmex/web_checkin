@@ -1,16 +1,23 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Form,
         Card,
-        Button
+        Button,
+        Alert
 } from 'react-bootstrap';
+import {MdErrorOutline} from 'react-icons/md';
 
-import getCookie from './getCookie'
+import cookieTokenCheck from './cookieTokenCheck';
+import apiBaseUrl from './apiBaseUrl';
 
 function Login() {
-  let cookie = getCookie('access_token');
-  if(cookie !== "") {
-    window.location.href="/admin";
+  if(cookieTokenCheck() === true) {
+    window.location.href = "/admin";
   }
+
+  const [alertShow, setAlertShow] = useState(false);
+  const [usrShow, setUsrShow] = useState(false);
+  const [passShow, setPassShow] = useState(false);
+  
   return (
     <Card className="mx-auto card-admin" variant="primary" style={{ width: '18rem' }}>
     <Card.Body>
@@ -18,22 +25,47 @@ function Login() {
       <Form >
         <Form.Group>
         <Form.Label>Nombre de Usuario</Form.Label>
+        <Alert variant="warning" show={usrShow}>Campo requerido</Alert>
         <Form.Control id="user" size="lg" type="text" placeholder="Escribe tu Nombre de Usuario" />
         <br></br>
         <Form.Label>Contraseña</Form.Label>
+        <Alert variant="warning" show={passShow}>Campo requerido</Alert>
         <Form.Control id="pass" size="lg" type="password" placeholder="Escribe tu Contraseña" />
         </Form.Group>
-        <Button className="btn-block" onClick={sendLogin}>Iniciar Sesión</Button>
+        <Alert show={alertShow} variant="danger">
+          <MdErrorOutline/> Ha habido un error de autenticación :c
+        </Alert>
+        <Button className="btn-block" onClick={() => sendLogin(setAlertShow, setUsrShow, setPassShow)}>Iniciar Sesión</Button>
       </Form>
     </Card.Body>
     </Card>
   );
 }
 
-function sendLogin() {
+async function sendLogin(setShow, setUsrShow, setPassShow) {
+  let usrVal = document.getElementById('user').value;
+  let usrPass = document.getElementById('pass').value;
+  let cancel = false;
+
+  if(usrVal === '') {
+    cancel = true;
+    setUsrShow(true);
+  } else {
+    setUsrShow(false);
+  }
+  if(usrPass === '') {
+    cancel = true;
+    setPassShow(true);
+  } else {
+    setPassShow(false);
+  }
+  if(cancel) {
+    return
+  }
+
   let details = {
-      'username': document.getElementById('user').value,
-      'password': document.getElementById('pass').value,
+    'username': usrVal,
+    'password': usrPass
   };
   
   let formBody = [];
@@ -43,30 +75,27 @@ function sendLogin() {
     formBody.push(encodedKey + "=" + encodedValue);
   }
   formBody = formBody.join("&");
-  console.log("The sent urlenc is: ", formBody);
-  
-  fetch('http://localhost:8000/token/auth', {
+  const url = apiBaseUrl + '/token/auth';
+  const params = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     body: formBody
-  }).then(resp => {
-    if(resp.ok) {
-      return resp.json()
-    } else {
-      return {err: true};
-    }
-  })
-  .then(json => {
-    console.log(json);
-    if(json.err === true){
-      console.log("There's been an error!");
-    } else {
-      document.cookie = `access_token=${json.access_token}`;
-      window.location.href = "/admin";
-    }
-  });
+  };
+
+  const resp = await fetch(url, params)
+  if(resp.ok) {
+    const jsonBody = await resp.json()
+    let d = new Date();
+    d.setTime(d.getTime() + (jsonBody.expires_in*1000));
+    document.cookie = `access_token=${jsonBody.access_token}; expires=${d.toUTCString()}; `;
+    window.location.href = "/admin";
+  } else {
+    console.log("There's been an error!");
+    setShow(true);
+  }
 }
+
 
 export default Login;
