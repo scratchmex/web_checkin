@@ -9,7 +9,7 @@ import {MdErrorOutline} from 'react-icons/md';
 import cookieTokenCheck from './cookieTokenCheck';
 import apiBaseUrl from './apiBaseUrl';
 
-function Login() {
+export default function Login() {
   if(cookieTokenCheck() === true) {
     window.location.href = "/admin";
   }
@@ -18,6 +18,60 @@ function Login() {
   const [usrShow, setUsrShow] = useState(false);
   const [passShow, setPassShow] = useState(false);
   
+  async function sendLogin() {
+    let usrVal = document.getElementById('user').value;
+    let usrPass = document.getElementById('pass').value;
+    let cancel = false;
+  
+    if(usrVal === '') {
+      cancel = true;
+      setUsrShow(true);
+    } else {
+      setUsrShow(false);
+    }
+    if(usrPass === '') {
+      cancel = true;
+      setPassShow(true);
+    } else {
+      setPassShow(false);
+    }
+    if(cancel) {
+      return
+    }
+  
+    let details = {
+      'username': usrVal,
+      'password': usrPass
+    };
+    
+    let formBody = [];
+    for (let property in details) {
+      let encodedKey = encodeURIComponent(property);
+      let encodedValue = encodeURIComponent(details[property]);
+      formBody.push(encodedKey + "=" + encodedValue);
+    }
+    formBody = formBody.join("&");
+    const url = apiBaseUrl + '/token/auth';
+    const params = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formBody
+    };
+  
+    const resp = await fetch(url, params)
+    if(resp.ok) {
+      const jsonBody = await resp.json()
+      let d = new Date();
+      d.setTime(d.getTime() + (jsonBody.expires_in*1000));
+      document.cookie = `access_token=${jsonBody.access_token}; expires=${d.toUTCString()}; `;
+      window.location.href = "/admin";
+    } else {
+      setAlertShow(true);
+    }
+  }
+
   return (
     <Card className="mx-auto card-admin" variant="primary" style={{ width: '18rem' }}>
     <Card.Body>
@@ -35,67 +89,9 @@ function Login() {
         <Alert show={alertShow} variant="danger">
           <MdErrorOutline/> Ha habido un error de autenticación :c
         </Alert>
-        <Button className="btn-block" onClick={() => sendLogin(setAlertShow, setUsrShow, setPassShow)}>Iniciar Sesión</Button>
+        <Button className="btn-block" onClick={sendLogin}>Iniciar Sesión</Button>
       </Form>
     </Card.Body>
     </Card>
   );
 }
-
-async function sendLogin(setShow, setUsrShow, setPassShow) {
-  let usrVal = document.getElementById('user').value;
-  let usrPass = document.getElementById('pass').value;
-  let cancel = false;
-
-  if(usrVal === '') {
-    cancel = true;
-    setUsrShow(true);
-  } else {
-    setUsrShow(false);
-  }
-  if(usrPass === '') {
-    cancel = true;
-    setPassShow(true);
-  } else {
-    setPassShow(false);
-  }
-  if(cancel) {
-    return
-  }
-
-  let details = {
-    'username': usrVal,
-    'password': usrPass
-  };
-  
-  let formBody = [];
-  for (let property in details) {
-    let encodedKey = encodeURIComponent(property);
-    let encodedValue = encodeURIComponent(details[property]);
-    formBody.push(encodedKey + "=" + encodedValue);
-  }
-  formBody = formBody.join("&");
-  const url = apiBaseUrl + '/token/auth';
-  const params = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: formBody
-  };
-
-  const resp = await fetch(url, params)
-  if(resp.ok) {
-    const jsonBody = await resp.json()
-    let d = new Date();
-    d.setTime(d.getTime() + (jsonBody.expires_in*1000));
-    document.cookie = `access_token=${jsonBody.access_token}; expires=${d.toUTCString()}; `;
-    window.location.href = "/admin";
-  } else {
-    console.log("There's been an error!");
-    setShow(true);
-  }
-}
-
-
-export default Login;
