@@ -3,17 +3,22 @@ import {
     BrowserRouter as Router,
     Switch,
     Route
-  } from "react-router-dom";
+} from "react-router-dom";
 
+import AdminLanding from './AdminLanding';
 import AdminUsersList from './AdminUsersList';
 import AdminEventsList from './AdminEventsList';
 import AdminAdminsList from './AdminAdminsList';
 import AdminCreateAdmin from './AdminCreateAdmin';
+import AdminValidateCheckin from './AdminValidateCheckin';
 
 export default function AdminView() {
     return (
         <Router>
             <Switch>
+                <Route path="/admin/validate-checkin">
+                    <AdminValidateCheckin />
+                </Route>
                 <Route path="/admin/users">
                     <AdminUsersList />
                 </Route>
@@ -27,7 +32,7 @@ export default function AdminView() {
                     <AdminCreateAdmin />
                 </Route>
                 <Route path="/admin">
-                    <h1>Admin, lel!</h1>
+                    <AdminLanding />
                 </Route>
             </Switch>
         </Router>

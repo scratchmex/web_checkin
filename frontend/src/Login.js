@@ -10,13 +10,20 @@ import cookieTokenCheck from './cookieTokenCheck';
 import apiBaseUrl from './apiBaseUrl';
 
 export default function Login() {
-  if(cookieTokenCheck() === true) {
-    window.location.href = "/admin";
-  }
+  let [check, setCheck] = useState(false);
 
-  const [alertShow, setAlertShow] = useState(false);
-  const [usrShow, setUsrShow] = useState(false);
-  const [passShow, setPassShow] = useState(false);
+  async function checkCookie() {
+    setCheck(await cookieTokenCheck());
+    if(check === true) {
+      window.location.href = "/admin";
+    }
+  }
+  
+  checkCookie();
+
+  let [alertShow, setAlertShow] = useState(false);
+  let [usrShow, setUsrShow] = useState(false);
+  let [passShow, setPassShow] = useState(false);
   
   async function sendLogin() {
     let usrVal = document.getElementById('user').value;

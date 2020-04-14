@@ -23,6 +23,7 @@ function Checkin() {
             cellSize: 4,
             scalable: true
         });
+        console.log(qrData);
     }
     
     async function doCheckin() {
@@ -35,22 +36,22 @@ function Checkin() {
         const params = {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(postBody)
         }
         const resp = await fetch(url, params);
         const jsonResp = await resp.json();
         if(resp.ok) {
-            setQrData(jsonResp.access_token);
             setQrModalShow(true);
+            setQrData(jsonResp.access_token);
             generateQR();
         }
     }
 
     return (
         <>
-        <Modal size='md' centered show={qrModalShow} onHide={handleClose}>
+        <Modal show={qrModalShow} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Completar Checkin</Modal.Title>
             </Modal.Header>
@@ -82,16 +83,14 @@ function Checkin() {
             <Form.Label>ID de evento</Form.Label>
             <Form.Control id="eventIdInput" size="lg" type="text" placeholder="ID" />
             </Form.Group>
-            <Button className="btn-block" onClick={doCheckin} variant="primary" >
-            Enviar
-            </Button>
         </Form>
+        <Button className="btn-block" onClick={doCheckin} variant="primary" >
+        Enviar
+        </Button>
         </Card.Body>
         </Card>
-
         </>
     );
 }
-
 
 export default Checkin;
