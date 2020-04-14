@@ -3,6 +3,7 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 
 from .routes import root, users, events, checkins, admins, token
+from .config import PATH_PREFIX
 
 
 middlewares = [
@@ -14,7 +15,10 @@ middlewares = [
     )
 ]
 
-app = FastAPI(middleware=middlewares)
+app = FastAPI(
+    openapi_prefix=PATH_PREFIX,
+    middleware=middlewares
+)
 
 
 app.include_router(
